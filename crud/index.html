@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="style.css">
+    <title>CRUD</title>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="heading-hero display-1 text-center">CRUD App</h1> 
+</div>
+   
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-sm-8 col-md-8 col-lg-12">
+            <table class="table table-dark table-hover mt-4">
+                <thead>
+                  <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Surname</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Delete</th>
+                    <th scope="col">Update</th>
+                  </tr>
+                </thead>
+                <tbody>       
+                </tbody>
+              </table>
+        </div>
+    </div>
+</div>
+
+    <div class="row justify-content-center text-center mt-4">
+            <div class="col-sm-4 col-md-8 col-lg-4">
+                <form method="post" action="#">
+                    <div class="mb-3">
+                      <label for="namecrud" class="form-label">Name</label>
+                      <input type="text" class="form-control" id="namecrud" aria-describedby="namecrud">
+                    </div>
+                    <div class="mb-3">
+                        <label for="surname" class="form-label">Surname</label>
+                        <input type="text" class="form-control" id="surname" aria-describedby="surname">
+                      </div>
+                      <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="text" class="form-control" id="email" aria-describedby="email">
+                      </div>
+                        <input type="button" value="Create" class="btn btn-primary mt-4 w-25" id="createBtn">
+                </form>
+            </div>
+      </div>
+
+      <div class="modal" id="modalDelete" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Delete</h5>
+              <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <p>Are you sure that you want to delete a user?</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="close btn btn-danger" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="deleteUser btn btn-primary">Save changes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal" id="modalUpdate" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Update</h5>
+              <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="row justify-content-center text-center mt-4">
+                    <form method="post" action="#">
+                        <div class="mb-3">
+                          <label for="namecrudUpdate" class="form-label">Name</label>
+                          <input type="text" class="form-control" id="namecrudUpdate" aria-describedby="namecrudUpdate">
+                        </div>
+                        <div class="mb-3">
+                            <label for="surnameUpdate" class="form-label">Surname</label>
+                            <input type="text" class="form-control" id="surnameUpdate" aria-describedby="surnameUpdate">
+                          </div>
+                        <div class="mb-3">
+                            <label for="emailUpdate" class="form-label">Email</label>
+                            <input type="text" class="form-control" id="emailUpdate" aria-describedby="emailUpdate">
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="close btn btn-danger" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="updateUser btn btn-primary">Save changes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+<script>
+$(document).ready(function(){
+
+    let UserID = 0;
+
+    function Read(){
+        
+      $(".table tbody").empty();
+
+      $.ajax({
+        url:"read.php",
+        type:"POST",
+        dataType:"JSON",
+        success:function(data){
+          for (let i = 0; i < data.length; i++) {
+          
+          let id = data[i].id;
+          let namecrud = data[i].namecrud;
+          let surname = data[i].surname;
+          let email = data[i].email;  
+
+          /*console.log(id + " " + namecrud + " " + surname + " " + email);*/
+          
+          $(".table tbody").append("<tr><td>"+id+"</td><td>"+namecrud+"</td><td>"+surname+"</td><td>"+email+"</td><td><button type='button' id="+id+" class='delete-btn btn btn-danger'>Delete</button></td><td><button type='button' id="+id+" class='update-btn btn btn-success'>Update</button></td></tr>");
+
+          $(".delete-btn").click(function(){
+            
+            UserID = $(this).attr("id");
+
+            $("#modalDelete").show();
+
+          });
+
+          $(".update-btn").click(function(){
+            
+            UserID = $(this).attr("id");
+
+            var red = $(this).closest("tr");
+            
+            $("#namecrudUpdate").val(red.find("td:eq(1)").text());
+            $("#surnameUpdate").val(red.find("td:eq(2)").text());
+            $("#emailUpdate").val(red.find("td:eq(3)").text());
+            
+
+            $("#modalUpdate").show();
+
+
+          });
+
+          }
+        },
+        error:function(){
+            alert("Error!");
+        }
+      });
+
+    }
+
+    $(".updateUser").click(function(){
+
+      let namecrud = $("#namecrudUpdate").val();
+      let surname = $("#surnameUpdate").val();
+      let email = $("#emailUpdate").val();
+
+      /*console.log(namecrud + " " + surname + " " + email);*/
+
+      $.ajax({
+        url:"update.php",
+        type:"POST",
+        data:{
+          UserID:UserID,
+          namecrud:namecrud,
+          surname:surname,
+          email:email
+        },
+        dataType:"JSON",
+        success:function(res){
+            for (let i = 0; i < res.length; i++) {
+              if (res[i].status == true) {
+                 alert(res[i].message);
+                 $("#modalUpdate").fadeOut();
+                 Read();
+              }else if(res[i].status == false){
+                alert(res[i].message);
+              }
+              
+            }
+        },
+        error:function(){
+          alert("Alert!");
+        }
+      });
+
+
+    });
+
+    $(".close").click(function(){
+       $("#modalDelete").fadeOut();
+       $('#modalUpdate').fadeOut();
+    });
+
+    $(".deleteUser").click(function(){
+      
+      $.ajax({
+        url:"delete.php",
+        type:"POST",
+        data:{
+          UserID:UserID
+        },
+        dataType:"JSON",
+        success:function(res){
+          for (let i = 0; i < res.length; i++) {
+              if (res[i].status == true) {
+                alert(res[i].message);
+                $("#modalDelete").fadeOut();
+                Read();
+              }
+            
+          }
+        },
+        error:function(){
+          alert("error!");
+        }
+      });
+
+    });
+
+    Read();
+
+    $("#createBtn").click(function(){
+        
+        let namecrud = $("#namecrud").val();
+        let surname = $("#surname").val();
+        let email = $("#email").val();
+
+        console.log(namecrud + " " + surname + " " + email);
+
+        $.ajax({
+            url:"create.php",
+            type:"POST",
+            data:{
+                UserID:UserID,
+                namecrud:namecrud,
+                surname:surname,
+                email:email
+            },
+            dataType:"JSON",
+            success:function(res){
+                for (let i = 0; i < res.length; i++) {
+                    if (res[i].status == false) {
+                       alert("Something is wrong with your inputs!");
+                    }else if(res[i].status == true){
+                       Read();
+                       alert("You have successfully created a user!");
+                       $("#namecrud").val("");
+                       $("#surname").val("");
+                       $("#email").val("");
+                    }
+                }
+            },
+            error:function(){
+                alert("Error!");
+            }
+        });
+
+    });
+
+});   
+</script>
+
+    
+</body>
+</html>

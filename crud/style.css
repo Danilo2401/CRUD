@@ -1,0 +1,12 @@
+body{
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.heading-hero{
+    color: #fff;
+    font-size: 60px;
+    margin: 30px 0;
+    background-color: #1251bd;
+    padding: 80px;
+}
